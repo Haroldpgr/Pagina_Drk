@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRK Launcher - Iniciar Sesión / Registrarse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        /* Estilo de scrollbar del launcher */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(107, 114, 128, 0.5) rgba(31, 41, 55, 0.2);
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.2);
+            border-radius: 4px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(107, 114, 128, 0.5);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+
+        /* Modal personalizado moderno */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-modal.show {
+            display: flex;
+        }
+
+        .custom-modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .custom-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .custom-modal-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .custom-modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            flex: 1;
+        }
+
+        .custom-modal-body {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .custom-modal-body p {
+            margin-bottom: 12px;
+        }
+
+        .custom-modal-user {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-modal-user-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .custom-modal-user-name {
+            color: #06b6d4;
+            font-weight: 600;
+        }
+
+        .custom-modal-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 12px;
+            background: rgba(6, 182, 212, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .custom-modal-checkbox:hover {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .custom-modal-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #06b6d4;
+        }
+
+        .custom-modal-checkbox label {
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .custom-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .custom-modal-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+        }
+
+        .custom-modal-btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            color: white;
+        }
+
+        .custom-modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .custom-modal-btn-secondary {
+            background: rgba(71, 85, 105, 0.5);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .custom-modal-btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.7);
+        }
+
+        .container {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
+        }
+
+        .logo-icon svg {
+            width: 50px;
+            height: 50px;
+            color: white;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #06b6d4;
+            border-bottom-color: #06b6d4;
+        }
+
+        .tab:hover {
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #64748b;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .return-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            margin-top: 20px;
+            display: none;
+        }
+
+        .return-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .return-button.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <div class="logo-icon">
+                <img src="/Drk_Launcher.png" alt="DRK Launcher" style="width: 80px; height: 80px; border-radius: 20px;">
+            </div>
+            <h1>DRK Launcher</h1>
+            <p>Servidor de Autenticación</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login', event)">Iniciar Sesión</button>
+            <button class="tab" onclick="switchTab('register', event)">Registrarse</button>
+        </div>
+
+        <div id="error-message" style="display: none;" class="error"></div>
+        <div id="success-message" style="display: none;" class="success"></div>
+
+        <!-- Formulario de Login -->
+        <div id="login-section" class="form-section active">
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-username">Usuario o Email</label>
+                    <input type="text" id="login-username" name="username" placeholder="Ingresa tu usuario o email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" name="password" placeholder="Ingresa tu contraseña" required>
+                </div>
+                <button type="submit" class="btn" id="login-btn">
+                    Iniciar Sesión
+                </button>
+            </form>
+        </div>
+
+        <!-- Formulario de Registro -->
+        <div id="register-section" class="form-section">
+            <form id="register-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-username">Nombre de Usuario</label>
+                    <input type="text" id="register-username" name="username" placeholder="Elige un nombre de usuario" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" name="email" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Contraseña</label>
+                    <input type="password" id="register-password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="register-profile">Nombre de Perfil Minecraft</label>
+                    <input type="text" id="register-profile" name="profileName" placeholder="Nombre para tu perfil de Minecraft" required>
+                </div>
+                <button type="submit" class="btn" id="register-btn">
+                    Crear Cuenta
+                </button>
+            </form>
+        </div>
+
+        <button id="return-to-launcher-btn" class="return-button" onclick="returnToLauncher()">
+            ✅ Volver al Launcher
+        </button>
+
+        <div class="footer">
+            <p>© 2024 DRK Launcher. Todos los derechos reservados.</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('[Login Page] Script cargado y ejecutándose...');
+        console.log('[Login Page] window.opener:', window.opener ? 'EXISTE' : 'NO EXISTE');
+        console.log('[Login Page] window.opener.closed:', window.opener ? window.opener.closed : 'N/A');
+        
+        // Manejador de errores global para silenciar errores no críticos
+        window.addEventListener('error', function(event) {
+            // Silenciar errores de SVG path que no son críticos
+            if (event.message && (
+                event.message.includes('attribute d: Expected number') ||
+                event.message.includes('translateContent') ||
+                (event.filename && event.filename.includes('translateContent'))
+            )) {
+                event.preventDefault();
+                console.warn('[Error silenciado] Error no crítico de SVG/translateContent:', event.message);
+                return true;
+            }
+        }, true);
+
+        // Función para mostrar modal personalizado
+        function showCustomModal(title, message, userInfo, showCheckbox, onConfirm, onCancel) {
+            const modal = document.getElementById('customModal');
+            const modalTitle = document.getElementById('customModalTitle');
+            const modalBody = document.getElementById('customModalBody');
+            const modalUser = document.getElementById('customModalUser');
+            const modalCheckbox = document.getElementById('customModalCheckbox');
+            const confirmBtn = document.getElementById('customModalConfirm');
+            const cancelBtn = document.getElementById('customModalCancel');
+
+            modalTitle.textContent = title;
+            modalBody.innerHTML = message;
+            
+            if (userInfo) {
+                modalUser.style.display = 'flex';
+                document.getElementById('customModalUserName').textContent = userInfo;
+                document.getElementById('customModalUserInitial').textContent = userInfo.charAt(0).toUpperCase();
+            } else {
+                modalUser.style.display = 'none';
+            }
+
+            modalCheckbox.style.display = showCheckbox ? 'flex' : 'none';
+            document.getElementById('customModalDontShow').checked = false;
+
+            confirmBtn.onclick = () => {
+                const dontShow = document.getElementById('customModalDontShow').checked;
+                if (dontShow && showCheckbox) {
+                    localStorage.setItem('drkLauncher_dontShowConfirm', 'true');
+                }
+                modal.classList.remove('show');
+                if (onConfirm) onConfirm();
+            };
+
+            cancelBtn.onclick = () => {
+                modal.classList.remove('show');
+                if (onCancel) onCancel();
+            };
+
+            modal.classList.add('show');
+        }
+
+        // Verificar si el usuario ya está autenticado
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('[Login] ===== DOMContentLoaded EVENT =====');
+            console.log('[Login] window.opener:', window.opener ? 'EXISTE (abierta desde launcher)' : 'NO EXISTE (abierta directamente)');
+            console.log('[Login] window.opener.closed:', window.opener ? window.opener.closed : 'N/A');
+            
+            // Verificar si hay sesión activa y si se abrió desde el launcher
+            const savedData = localStorage.getItem('drkAuthData');
+            console.log('[Login] Datos guardados en localStorage:', savedData ? 'SÍ' : 'NO');
+            if (savedData) {
+                try {
+                    const authData = JSON.parse(savedData);
+                    const username = authData.selectedProfile?.name || 'Desconocido';
+                    
+                    // Verificar si realmente se abrió desde el launcher
+                    // Solo procesar si window.opener existe Y no está cerrado
+                    const isOpenedFromLauncher = window.opener && !window.opener.closed;
+                    
+                    if (isOpenedFromLauncher && authData.accessToken) {
+                        // Verificar si el usuario ya decidió no mostrar el mensaje
+                        const dontShowAgain = localStorage.getItem('drkLauncher_dontShowConfirm');
+                        
+                        if (!dontShowAgain) {
+                            // Mostrar modal personalizado
+                            showCustomModal(
+                                'Sesión activa detectada',
+                                '<p>¿Deseas agregar esta cuenta al launcher?</p><p>Si aceptas, la cuenta se agregará automáticamente al launcher y esta ventana se cerrará.</p>',
+                                username,
+                                true,
+                                () => {
+                                    // Enviar datos al launcher
+                                    console.log('[Login] Sesión activa detectada, enviando datos al launcher...');
+                                    try {
+                                        if (window.opener && !window.opener.closed) {
+                                            console.log('[Login] Enviando datos de sesión activa al launcher:', {
+                                                hasAuthData: !!authData,
+                                                hasAccessToken: !!authData?.accessToken,
+                                                accessTokenLength: authData?.accessToken?.length
+                                            });
+                                            window.opener.postMessage({ 
+                                                type: 'DRK_AUTH_SUCCESS',
+                                                data: authData
+                                            }, '*'); // Usar '*' para permitir cualquier origen (desarrollo local)
+                                            console.log('[Login] Mensaje de sesión activa enviado exitosamente');
+                                        }
+                                    } catch (error) {
+                                        console.error('[Login] Error al enviar mensaje al launcher:', error);
+                                    }
+                                    
+                                    // Cerrar la ventana después de un breve delay
+                                    setTimeout(() => {
+                                        if (window.opener && !window.opener.closed) {
+                                            window.close();
+                                        }
+                                    }, 500);
+                                },
+                                () => {
+                                    // Si no confirma, cerrar la ventana sin enviar datos
+                                    setTimeout(() => {
+                                        if (window.opener && !window.opener.closed) {
+                                            window.close();
+                                        }
+                                    }, 500);
+                                }
+                            );
+                        } else {
+                            // Si ya decidió no mostrar el mensaje, enviar automáticamente
+                            console.log('[Login] Sesión activa detectada, enviando datos al launcher automáticamente...');
+                            try {
+                                if (window.opener && !window.opener.closed) {
+                                    console.log('[Login] Enviando datos de sesión activa al launcher (auto):', {
+                                        hasAuthData: !!authData,
+                                        hasAccessToken: !!authData?.accessToken,
+                                        accessTokenLength: authData?.accessToken?.length
+                                    });
+                                    window.opener.postMessage({ 
+                                        type: 'DRK_AUTH_SUCCESS',
+                                        data: authData
+                                    }, '*'); // Usar '*' para permitir cualquier origen (desarrollo local)
+                                    console.log('[Login] Mensaje de sesión activa (auto) enviado exitosamente');
+                                }
+                            } catch (error) {
+                                console.error('[Login] Error al enviar mensaje al launcher:', error);
+                            }
+                            
+                            // Cerrar la ventana después de un breve delay
+                            setTimeout(() => {
+                                if (window.opener && !window.opener.closed) {
+                                    window.close();
+                                }
+                            }, 500);
+                        }
+                        return; // No redirigir a /home si se abrió desde el launcher
+                    } else if (!window.opener) {
+                        // Si no se abrió desde el launcher, NO hacer nada automático
+                        // Dejar que el usuario vea el login normalmente
+                        // No redirigir ni mostrar modales
+                        return;
+                    }
+                } catch (error) {
+                    console.error('[Login] Error al parsear datos de sesión:', error);
+                }
+            }
+
+            // Verificar si hay parámetro de tab en la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab === 'register') {
+                switchTab('register');
+            } else if (tab === 'login') {
+                switchTab('login');
+            }
+        });
+
+        function switchTab(tab, event = null) {
+            // Actualizar tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Si se llama programáticamente, activar el tab correspondiente
+                const tabs = document.querySelectorAll('.tab');
+                tabs.forEach((t, index) => {
+                    if ((tab === 'login' && index === 0) || (tab === 'register' && index === 1)) {
+                        t.classList.add('active');
+                    }
+                });
+            }
+
+            // Mostrar/ocultar secciones
+            document.getElementById('login-section').classList.toggle('active', tab === 'login');
+            document.getElementById('register-section').classList.toggle('active', tab === 'register');
+
+            // Limpiar mensajes
+            hideMessages();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function hideMessages() {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showReturnToLauncherButton() {
+            const btn = document.getElementById('return-to-launcher-btn');
+            if (btn) {
+                btn.classList.add('show');
+            }
+        }
+
+        function returnToLauncher() {
+            // Cerrar la ventana si fue abierta desde el launcher
+            if (window.opener && !window.opener.closed) {
+                window.close();
+            } else {
+                // Si no hay opener, mostrar mensaje
+                alert('Por favor, cierra esta ventana y vuelve al launcher. Tu cuenta ya está lista para usar.');
+            }
+        }
+
+        // Escuchar mensajes del launcher (si es necesario)
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'DRK_AUTH_REQUEST') {
+                // El launcher puede solicitar información
+                console.log('Mensaje recibido del launcher:', event.data);
+            }
+        });
+
+        async function handleLogin(event) {
+            console.log('[Login] handleLogin llamado');
+            event.preventDefault();
+            hideMessages();
+
+            const btn = document.getElementById('login-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Iniciando sesión...';
+
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            console.log('[Login] Intentando iniciar sesión para:', username);
+            console.log('[Login] window.opener existe:', !!window.opener);
+            console.log('[Login] window.opener.closed:', window.opener ? window.opener.closed : 'N/A');
+
+            try {
+                console.log('[Login] Enviando solicitud de autenticación...');
+                const response = await fetch('/authserver/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        agent: {
+                            name: 'Minecraft',
+                            version: 1
+                        },
+                        username: username,
+                        password: password,
+                        requestUser: true
+                    })
+                });
+
+                console.log('[Login] Respuesta recibida:', {
+                    status: response.status,
+                    ok: response.ok
+                });
+                
+                const data = await response.json();
+                console.log('[Login] Datos de respuesta:', {
+                    hasAccessToken: !!data.accessToken,
+                    hasError: !!data.error,
+                    errorMessage: data.errorMessage
+                });
+
+                if (response.ok && data.accessToken) {
+                    console.log('[Login] Inicio de sesión exitoso para:', data.selectedProfile.name);
+                    showSuccess('¡Inicio de sesión exitoso! Usuario: ' + data.selectedProfile.name);
+                    
+                    // Guardar datos en localStorage para la página de home
+                    const authData = {
+                        accessToken: data.accessToken,
+                        clientToken: data.clientToken,
+                        selectedProfile: data.selectedProfile,
+                        availableProfiles: data.availableProfiles,
+                        user: data.user
+                    };
+                    console.log('[Login] Datos de autenticación recibidos:', {
+                        hasAccessToken: !!authData.accessToken,
+                        accessTokenLength: authData.accessToken?.length,
+                        hasClientToken: !!authData.clientToken,
+                        hasSelectedProfile: !!authData.selectedProfile,
+                        selectedProfileName: authData.selectedProfile?.name
+                    });
+                    
+                    localStorage.setItem('drkAuthData', JSON.stringify(authData));
+                    console.log('[Login] Datos guardados en localStorage');
+                    
+                    // Enviar datos al launcher si está abierto desde el launcher
+                    if (window.opener && !window.opener.closed) {
+                        console.log('[Login] Enviando datos al launcher...');
+                        console.log('[Login] Datos a enviar:', {
+                            type: 'DRK_AUTH_SUCCESS',
+                            hasData: !!authData,
+                            hasAccessToken: !!authData.accessToken,
+                            accessTokenLength: authData.accessToken?.length
+                        });
+                        
+                        try {
+                            window.opener.postMessage({ 
+                                type: 'DRK_AUTH_SUCCESS', 
+                                data: authData
+                            }, '*');
+                            console.log('[Login] Mensaje enviado exitosamente al launcher');
+                        } catch (error) {
+                            console.error('[Login] Error al enviar mensaje al launcher:', error);
+                        }
+                        
+                        // Auto-cerrar después de 2 segundos si hay opener (desde el launcher)
+                        setTimeout(() => {
+                            console.log('[Login] Cerrando ventana del launcher...');
+                            window.close();
+                        }, 2000);
+                    } else {
+                        // Si no hay opener, redirigir al home después de 1 segundo
+                        console.log('[Login] Redirigiendo a /home...');
+                        setTimeout(() => {
+                            window.location.href = '/home';
+                        }, 1000);
+                    }
+                } else {
+                    showError(data.errorMessage || 'Error al iniciar sesión. Verifica tus credenciales.');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (error) {
+                showError('Error de conexión. Por favor, verifica que el servidor esté funcionando.');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            hideMessages();
+
+            const btn = document.getElementById('register-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Creando cuenta...';
+
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const profileName = document.getElementById('register-profile').value;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                        profileName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('¡Cuenta creada exitosamente! Iniciando sesión automáticamente...');
+                    
+                    // Auto-iniciar sesión después de crear cuenta
+                    setTimeout(async () => {
+                        try {
+                            // Intentar iniciar sesión automáticamente
+                            const loginResponse = await fetch('/authserver/authenticate', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    agent: {
+                                        name: 'Minecraft',
+                                        version: 1
+                                    },
+                                    username: username,
+                                    password: password,
+                                    requestUser: true
+                                })
+                            });
+
+                            const loginData = await loginResponse.json();
+
+                            if (loginResponse.ok && loginData.accessToken) {
+                                showSuccess('¡Cuenta creada e iniciada exitosamente! Usuario: ' + loginData.selectedProfile.name);
+                                
+                                // Guardar datos en localStorage
+                                const authData = {
+                                    accessToken: loginData.accessToken,
+                                    clientToken: loginData.clientToken,
+                                    selectedProfile: loginData.selectedProfile,
+                                    availableProfiles: loginData.availableProfiles,
+                                    user: loginData.user
+                                };
+                                console.log('[Register] Datos de autenticación recibidos:', {
+                                    hasAccessToken: !!authData.accessToken,
+                                    accessTokenLength: authData.accessToken?.length,
+                                    hasClientToken: !!authData.clientToken,
+                                    hasSelectedProfile: !!authData.selectedProfile,
+                                    selectedProfileName: authData.selectedProfile?.name
+                                });
+                                
+                                localStorage.setItem('drkAuthData', JSON.stringify(authData));
+                                console.log('[Register] Datos guardados en localStorage');
+                                
+                                // Enviar datos al launcher si está abierto desde el launcher
+                                if (window.opener && !window.opener.closed) {
+                                    console.log('[Register] Enviando datos al launcher...');
+                                    console.log('[Register] Datos a enviar:', {
+                                        type: 'DRK_AUTH_SUCCESS',
+                                        hasData: !!authData,
+                                        hasAccessToken: !!authData.accessToken,
+                                        accessTokenLength: authData.accessToken?.length
+                                    });
+                                    
+                                    try {
+                                        window.opener.postMessage({ 
+                                            type: 'DRK_AUTH_SUCCESS', 
+                                            data: authData
+                                        }, '*');
+                                        console.log('[Register] Mensaje enviado exitosamente al launcher');
+                                    } catch (error) {
+                                        console.error('[Register] Error al enviar mensaje al launcher:', error);
+                                    }
+                                    
+                                    // Auto-cerrar después de 2 segundos si hay opener
+                                    setTimeout(() => {
+                                        window.close();
+                                    }, 2000);
+                                } else {
+                                    // Si no hay opener, redirigir al home
+                                    setTimeout(() => {
+                                        window.location.href = '/home';
+                                    }, 1000);
+                                }
+                            } else {
+                                // Si falla el auto-login, cambiar a pestaña de login
+                                showSuccess('¡Cuenta creada exitosamente! Por favor, inicia sesión manualmente.');
+                                document.querySelectorAll('.tab')[0].click();
+                                document.getElementById('login-username').value = username;
+                                document.getElementById('login-password').value = password;
+                            }
+                        } catch (error) {
+                            // Si falla, cambiar a pestaña de login
+                            showSuccess('¡Cuenta creada exitosamente! Por favor, inicia sesión manualmente.');
+                            document.querySelectorAll('.tab')[0].click();
+                            document.getElementById('login-username').value = username;
+                            document.getElementById('login-password').value = password;
+                        }
+                    }, 1000);
+                } else {
+                    showError(data.error || data.message || 'Error al crear la cuenta. Intenta con otro usuario o email.');
+                }
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            } catch (error) {
+                showError('Error de conexión. Por favor, verifica que el servidor esté funcionando.');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+    </script>
+
+    <!-- Modal personalizado -->
+    <div id="customModal" class="custom-modal">
+        <div class="custom-modal-content">
+            <div class="custom-modal-header">
+                <div class="custom-modal-icon">🔐</div>
+                <div class="custom-modal-title" id="customModalTitle">Confirmación</div>
+            </div>
+            <div class="custom-modal-body" id="customModalBody">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="custom-modal-user" id="customModalUser" style="display: none;">
+                <div class="custom-modal-user-icon" id="customModalUserInitial">U</div>
+                <div>
+                    <div style="color: #94a3b8; font-size: 12px;">Usuario</div>
+                    <div class="custom-modal-user-name" id="customModalUserName">Usuario</div>
+                </div>
+            </div>
+            <div class="custom-modal-checkbox" id="customModalCheckbox" style="display: none;">
+                <input type="checkbox" id="customModalDontShow">
+                <label for="customModalDontShow">No volver a mostrar este mensaje</label>
+            </div>
+            <div class="custom-modal-buttons">
+                <button class="custom-modal-btn custom-modal-btn-secondary" id="customModalCancel">Cancelar</button>
+                <button class="custom-modal-btn custom-modal-btn-primary" id="customModalConfirm">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

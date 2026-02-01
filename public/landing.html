@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRK Launcher - El Launcher de Minecraft</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #131827;
+            --bg-card: #1a1f2e;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: rgba(59, 130, 246, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Estilo de scrollbar del launcher */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(107, 114, 128, 0.5) rgba(31, 41, 55, 0.2);
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.2);
+            border-radius: 4px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(107, 114, 128, 0.5);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+
+        .navbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .navbar-brand .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-nav {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-nav-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-nav-secondary:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .btn-nav-primary {
+            background: var(--accent);
+            border: none;
+            color: white;
+        }
+
+        .btn-nav-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .hero {
+            padding: 80px 32px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .features {
+            padding: 80px 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 48px;
+            color: var(--text-primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .comparison {
+            padding: 80px 32px;
+            background: var(--bg-secondary);
+        }
+
+        .comparison-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .comparison-intro {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 48px;
+        }
+
+        .comparison-intro p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .comparison-table {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-secondary);
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .feature-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .highlight {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 24px;
+            }
+
+            .hero-description {
+                font-size: 16px;
+            }
+
+            .navbar-links {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Aplicar animaciones */
+        .hero {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero img {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .navbar {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .feature-card {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+        .feature-card:nth-child(7) { animation-delay: 0.7s; }
+        .feature-card:nth-child(8) { animation-delay: 0.8s; }
+        .feature-card:nth-child(9) { animation-delay: 0.9s; }
+        .feature-card:nth-child(10) { animation-delay: 1s; }
+        .feature-card:nth-child(11) { animation-delay: 1.1s; }
+        .feature-card:nth-child(12) { animation-delay: 1.2s; }
+
+        .comparison-table {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .section-title {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Hover effects mejorados */
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Transiciones suaves */
+        .feature-card,
+        .btn,
+        .nav-link {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Intersection Observer para animaciones al hacer scroll */
+        .fade-in-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="/Drk_Launcher.png" alt="DRK Launcher" style="width: 32px; height: 32px; border-radius: 8px;">
+            <span>DRK Launcher</span>
+        </div>
+        <div class="navbar-links">
+            <a href="#inicio" class="nav-link active">Inicio</a>
+            <a href="#caracteristicas" class="nav-link">Características</a>
+            <a href="#comparativa" class="nav-link">Comparativa</a>
+            <a href="#blog" class="nav-link">Blog</a>
+        </div>
+        <div class="navbar-actions">
+            <a href="/login" class="btn-nav btn-nav-secondary">Iniciar Sesión</a>
+            <a href="/login?tab=register" class="btn-nav btn-nav-primary">Registrarse</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <div style="margin-bottom: 32px;">
+            <img src="/Drk_Launcher.png" alt="DRK Launcher" style="width: 120px; height: 120px; border-radius: 20px; margin: 0 auto; display: block; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);">
+        </div>
+        <h1 class="hero-title">El Launcher de Minecraft</h1>
+        <h2 class="hero-subtitle">más completo y potente</h2>
+        <p class="hero-description">
+            DRK Launcher es un launcher de Minecraft de código abierto que combina potencia, seguridad y facilidad de uso. Con soporte completo para Modrinth y CurseForge, múltiples métodos de autenticación, gestión avanzada de instancias y herramientas profesionales, DRK Launcher es la solución definitiva para jugadores y creadores de contenido.
+        </p>
+        <div class="hero-cta">
+            <a href="/login" class="btn btn-primary">Comenzar Ahora</a>
+            <a href="#" class="btn btn-secondary">Descargar Launcher</a>
+        </div>
+        <div style="margin-top: 32px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; color: var(--text-secondary); font-size: 14px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>✅</span>
+                <span>100% Gratis</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>✅</span>
+                <span>Código Abierto</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>✅</span>
+                <span>Sin Anuncios</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>✅</span>
+                <span>Multiplataforma</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="caracteristicas">
+        <h2 class="section-title">¿Por qué DRK Launcher?</h2>
+        <div style="text-align: center; max-width: 700px; margin: 0 auto 48px; color: var(--text-secondary);">
+            <p style="font-size: 16px; line-height: 1.8;">
+                DRK Launcher ofrece un conjunto completo de herramientas profesionales para gestionar tu experiencia de Minecraft. Desde la instalación de modpacks hasta el análisis de errores, todo en un solo lugar.
+            </p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Rapidez y Rendimiento</h3>
+                <p class="feature-description">
+                    DRK Launcher está optimizado para PCs de bajos recursos. Inicio rápido, gestión eficiente de memoria y limpieza automática de archivos temporales para un rendimiento óptimo.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3 class="feature-title">Múltiples Métodos de Autenticación</h3>
+                <p class="feature-description">
+                    Soporte completo para Microsoft, cuentas no-premium, Ely.by, LittleSkin, Yggdrasil y nuestro propio sistema DRK Auth. Gestiona múltiples perfiles y cambia entre ellos fácilmente.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <h3 class="feature-title">Modrinth y CurseForge</h3>
+                <p class="feature-description">
+                    Acceso completo a las dos plataformas más grandes de contenido. Descarga modpacks, mods, resourcepacks, datapacks y shaders directamente desde ambas plataformas.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <h3 class="feature-title">Soporte Completo de ModLoaders</h3>
+                <p class="feature-description">
+                    Compatible con Forge, Fabric, NeoForge, Quilt, LegacyFabric y OptiFine. Instala y gestiona cualquier tipo de modpack sin complicaciones.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📁</div>
+                <h3 class="feature-title">Sistema de Instancias Avanzado</h3>
+                <p class="feature-description">
+                    Crea y gestiona múltiples instancias aisladas. Cada instancia mantiene su propia configuración, mods y versiones, evitando conflictos entre diferentes modpacks.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⬇️</div>
+                <h3 class="feature-title">Descargas Inteligentes</h3>
+                <p class="feature-description">
+                    Sistema de cola de descargas con gestión automática de versiones compatibles. Descarga múltiples elementos simultáneamente con seguimiento de progreso en tiempo real.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <h3 class="feature-title">Gestión de Servidores</h3>
+                <p class="feature-description">
+                    Lista de servidores favoritos con ping automático, información de jugadores en línea y acceso rápido. Copia IPs con un solo clic.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛠️</div>
+                <h3 class="feature-title">Gestión de Java Automática</h3>
+                <p class="feature-description">
+                    Detección automática de instalaciones de Java. Configuración de RAM y versión de Java por instancia para optimizar el rendimiento.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Gestión de Skins</h3>
+                <p class="feature-description">
+                    Sube y gestiona tus skins personalizadas. Vista previa en tiempo real y aplicación directa a tu perfil de Minecraft.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Análisis de Crashes</h3>
+                <p class="feature-description">
+                    Herramienta integrada para analizar logs de errores y crashes. Identifica problemas comunes y obtén sugerencias de solución automáticas.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📜</div>
+                <h3 class="feature-title">Sistema de Logs</h3>
+                <p class="feature-description">
+                    Visualiza y analiza logs de juego, descargas y errores. Historial completo de actividad con búsqueda y filtros avanzados.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Seguridad y Confiabilidad</h3>
+                <p class="feature-description">
+                    Código abierto, libre de virus y malware. Escaneos continuos de seguridad y actualizaciones regulares para mantener tu experiencia segura.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="comparison" id="comparativa">
+        <div class="comparison-content">
+            <h2 class="section-title">Nuestra Comparativa</h2>
+            <div class="comparison-intro">
+                <p>
+                    Compara las opciones de los launchers de Minecraft más conocidos. Aquí encontrarás información sobre el soporte de mods, seguridad, rendimiento, y más.
+                </p>
+            </div>
+            <div class="comparison-table">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Característica</th>
+                                <th>DRK Launcher</th>
+                                <th>SK Launcher</th>
+                                <th>TLauncher</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="feature-name">Soporte de ModLoaders</td>
+                                <td class="highlight">Amplio (Forge, Fabric, NeoForge, Quilt, LegacyFabric y OptiFine)</td>
+                                <td>Limitado (Forge, Fabric, NeoForge y Quilt)</td>
+                                <td>Limitado (Forge, Fabric y OptiFine)</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Plataformas de Contenido</td>
+                                <td class="highlight">Modrinth y CurseForge integrados</td>
+                                <td>Solo Modrinth</td>
+                                <td>Limitado (solo algunos modpacks)</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Tipos de Contenido</td>
+                                <td class="highlight">Modpacks, Mods, Resourcepacks, Datapacks y Shaders</td>
+                                <td>Modpacks y Mods principalmente</td>
+                                <td>Modpacks y Mods</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Métodos de Autenticación</td>
+                                <td class="highlight">Microsoft, No-premium, Ely.by, LittleSkin, Yggdrasil, DRK Auth</td>
+                                <td>Microsoft y No-premium</td>
+                                <td>No-premium principalmente</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Sistema de Instancias</td>
+                                <td class="highlight">Completo (múltiples instancias aisladas)</td>
+                                <td>Básico</td>
+                                <td>Limitado</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Gestión de Descargas</td>
+                                <td class="highlight">Cola de descargas, múltiples simultáneas, seguimiento de progreso</td>
+                                <td>Descargas básicas</td>
+                                <td>Descargas básicas</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Gestión de Java</td>
+                                <td class="highlight">Detección automática y configuración por instancia</td>
+                                <td>Configuración manual</td>
+                                <td>Configuración manual</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Análisis de Crashes</td>
+                                <td class="highlight">Herramienta integrada de análisis de logs</td>
+                                <td>No disponible</td>
+                                <td>No disponible</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Gestión de Servidores</td>
+                                <td class="highlight">Lista de favoritos, ping automático, información en tiempo real</td>
+                                <td>Básico</td>
+                                <td>No disponible</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Rendimiento</td>
+                                <td class="highlight">Optimizado para PCs de bajos recursos</td>
+                                <td>Ligero y rápido</td>
+                                <td>Dependiente de la configuración de mods</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Seguridad</td>
+                                <td class="highlight">Código abierto, libre de virus y malware</td>
+                                <td>Seguro (VirusTotal) pero con comportamientos sospechosos</td>
+                                <td>Seguro (VirusTotal) pero con comportamientos sospechosos</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Código Abierto</td>
+                                <td class="highlight">Sí</td>
+                                <td>No</td>
+                                <td>No</td>
+                            </tr>
+                            <tr>
+                                <td class="feature-name">Gestión de Skins</td>
+                                <td class="highlight">Soporte completo con editor integrado</td>
+                                <td>Soporte completo</td>
+                                <td>Soporte completo (Skins HD y capas)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="features" style="background: var(--bg-secondary); padding: 80px 32px;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <h2 class="section-title">DRK Launcher en Números</h2>
+            <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon" style="margin: 0 auto 16px;">📦</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">2</div>
+                    <div style="color: var(--text-secondary); font-size: 14px;">Plataformas Integradas</div>
+                    <div style="color: var(--text-primary); font-size: 12px; margin-top: 4px;">Modrinth y CurseForge</div>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon" style="margin: 0 auto 16px;">🔧</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">6</div>
+                    <div style="color: var(--text-secondary); font-size: 14px;">ModLoaders Soportados</div>
+                    <div style="color: var(--text-primary); font-size: 12px; margin-top: 4px;">Forge, Fabric, NeoForge, Quilt, LegacyFabric, OptiFine</div>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon" style="margin: 0 auto 16px;">👥</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">6</div>
+                    <div style="color: var(--text-secondary); font-size: 14px;">Métodos de Autenticación</div>
+                    <div style="color: var(--text-primary); font-size: 12px; margin-top: 4px;">Microsoft, No-premium, Ely.by, LittleSkin, Yggdrasil, DRK Auth</div>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon" style="margin: 0 auto 16px;">📋</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">5</div>
+                    <div style="color: var(--text-secondary); font-size: 14px;">Tipos de Contenido</div>
+                    <div style="color: var(--text-primary); font-size: 12px; margin-top: 4px;">Modpacks, Mods, Resourcepacks, Datapacks, Shaders</div>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon" style="margin: 0 auto 16px;">⚡</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">∞</div>
+                    <div style="color: var(--text-secondary); font-size: 14px;">Instancias Ilimitadas</div>
+                    <div style="color: var(--text-primary); font-size: 12px; margin-top: 4px;">Crea todas las que necesites</div>
+                </div>
+                <div class="feature-card" style="text-align: center;">
+                    <div class="feature-icon" style="margin: 0 auto 16px;">🆓</div>
+                    <div style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">100%</div>
+                    <div style="color: var(--text-secondary); font-size: 14px;">Gratis y Open Source</div>
+                    <div style="color: var(--text-primary); font-size: 12px; margin-top: 4px;">Sin costos ocultos</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="features" id="descargas">
+        <h2 class="section-title">¿Cómo Funciona DRK Launcher?</h2>
+        <div style="max-width: 1000px; margin: 0 auto;">
+            <div style="display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent);">1</div>
+                        <h3 class="feature-title" style="margin: 0;">Descarga e Instala</h3>
+                    </div>
+                    <p class="feature-description">
+                        Descarga DRK Launcher para Windows, macOS o Linux. La instalación es rápida y sencilla, sin pasos complicados. El launcher detecta automáticamente Java si está instalado.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent);">2</div>
+                        <h3 class="feature-title" style="margin: 0;">Inicia Sesión</h3>
+                    </div>
+                    <p class="feature-description">
+                        Elige tu método de autenticación preferido: Microsoft, cuenta no-premium, Ely.by, LittleSkin, Yggdrasil o DRK Auth. Puedes tener múltiples perfiles y cambiar entre ellos fácilmente.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent);">3</div>
+                        <h3 class="feature-title" style="margin: 0;">Explora Contenido</h3>
+                    </div>
+                    <p class="feature-description">
+                        Navega por miles de modpacks, mods, shaders, resourcepacks y datapacks desde Modrinth y CurseForge directamente desde el launcher. Búsqueda avanzada y filtros por versión y modloader.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent);">4</div>
+                        <h3 class="feature-title" style="margin: 0;">Crea Instancias</h3>
+                    </div>
+                    <p class="feature-description">
+                        Crea instancias aisladas para cada modpack o versión. Cada instancia mantiene su propia configuración, mods, resourcepacks y shaders. El sistema detecta automáticamente versiones compatibles.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent);">5</div>
+                        <h3 class="feature-title" style="margin: 0;">Instala Mods</h3>
+                    </div>
+                    <p class="feature-description">
+                        Instala mods, resourcepacks, shaders y datapacks directamente desde el launcher. El sistema detecta automáticamente versiones compatibles con tu instancia y modloader. Descarga múltiples elementos en paralelo.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent);">6</div>
+                        <h3 class="feature-title" style="margin: 0;">¡Juega!</h3>
+                    </div>
+                    <p class="feature-description">
+                        Lanza tu instancia con un solo clic. DRK Launcher gestiona automáticamente Java, RAM y todas las configuraciones necesarias. Visualiza logs en tiempo real y analiza crashes si ocurren problemas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Details Section -->
+    <section class="comparison" style="padding: 80px 32px;">
+        <div class="comparison-content">
+            <h2 class="section-title">Especificaciones Técnicas</h2>
+            <div style="max-width: 1000px; margin: 0 auto;">
+                <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                    <div class="feature-card">
+                        <h3 class="feature-title" style="margin-bottom: 16px;">Sistemas Operativos</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li>✅ Windows 7, 8, 10, 11 (x64)</li>
+                            <li>✅ macOS 10.14+ (Intel y Apple Silicon)</li>
+                            <li>✅ Linux (todas las distribuciones principales)</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-title" style="margin-bottom: 16px;">Versiones de Minecraft</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li>✅ Desde la versión 1.0 hasta la última snapshot</li>
+                            <li>✅ Versiones Alpha y Beta históricas</li>
+                            <li>✅ Todas las versiones estables y de desarrollo</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-title" style="margin-bottom: 16px;">Requisitos del Sistema</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li>✅ RAM: Mínimo 2GB (recomendado 4GB+)</li>
+                            <li>✅ Espacio en disco: 500MB para el launcher</li>
+                            <li>✅ Conexión a Internet para descargas</li>
+                            <li>✅ Java 8, 17 o 21 (se detecta automáticamente)</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-title" style="margin-bottom: 16px;">Versiones de Java Soportadas</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li>✅ Java 8 (Minecraft 1.16.5 y anteriores)</li>
+                            <li>✅ Java 17 (Minecraft 1.17 - 1.20.x)</li>
+                            <li>✅ Java 21 (Minecraft 1.21+)</li>
+                            <li>✅ Descarga automática desde Adoptium</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-title" style="margin-bottom: 16px;">APIs Integradas</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li>✅ Modrinth API (v2)</li>
+                            <li>✅ CurseForge API</li>
+                            <li>✅ Mojang/Microsoft Auth</li>
+                            <li>✅ Yggdrasil Protocol</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h3 class="feature-title" style="margin-bottom: 16px;">Tecnologías</h3>
+                        <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 2;">
+                            <li>✅ Electron (aplicación de escritorio)</li>
+                            <li>✅ React (interfaz de usuario)</li>
+                            <li>✅ TypeScript (código base)</li>
+                            <li>✅ Node.js (backend y servicios)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section class="features" id="blog" style="background: var(--bg-secondary); padding: 80px 32px;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <h2 class="section-title">Blog y Noticias</h2>
+            <div style="text-align: center; max-width: 700px; margin: 0 auto 48px; color: var(--text-secondary);">
+                <p style="font-size: 16px; line-height: 1.8;">
+                    Mantente al día con las últimas actualizaciones, tutoriales y noticias sobre DRK Launcher y la comunidad de Minecraft.
+                </p>
+            </div>
+            <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+                <div class="feature-card">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, var(--accent), #6366f1); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        🎮
+                    </div>
+                    <h3 class="feature-title">Nueva Actualización Disponible</h3>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;">Publicado el 15 de Enero, 2024</p>
+                    <p class="feature-description">
+                        Descubre las nuevas características de DRK Launcher: mejoras de rendimiento, soporte mejorado para CurseForge, y nuevas opciones de personalización.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        📚
+                    </div>
+                    <h3 class="feature-title">Guía: Cómo Instalar tu Primer Modpack</h3>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;">Publicado el 10 de Enero, 2024</p>
+                    <p class="feature-description">
+                        Tutorial paso a paso para instalar modpacks desde Modrinth y CurseForge. Aprende a crear instancias, gestionar mods y optimizar el rendimiento.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        🔧
+                    </div>
+                    <h3 class="feature-title">Optimización para PCs de Bajos Recursos</h3>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;">Publicado el 5 de Enero, 2024</p>
+                    <p class="feature-description">
+                        Consejos y trucos para mejorar el rendimiento de DRK Launcher y Minecraft en computadoras con recursos limitados. Configuración de RAM y Java optimizada.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        🎨
+                    </div>
+                    <h3 class="feature-title">Personaliza tu Experiencia</h3>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;">Publicado el 1 de Enero, 2024</p>
+                    <p class="feature-description">
+                        Aprende a personalizar skins, gestionar múltiples perfiles y configurar instancias para diferentes modpacks. Maximiza tu experiencia de juego.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        🐛
+                    </div>
+                    <h3 class="feature-title">Reporte de Errores y Soluciones</h3>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;">Publicado el 28 de Diciembre, 2023</p>
+                    <p class="feature-description">
+                        Soluciones comunes a problemas frecuentes. Aprende a usar el analizador de crashes integrado y cómo reportar errores efectivamente.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #06b6d4, #0891b2); border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        👥
+                    </div>
+                    <h3 class="feature-title">Únete a la Comunidad</h3>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 12px;">Publicado el 25 de Diciembre, 2023</p>
+                    <p class="feature-description">
+                        Conoce a otros usuarios de DRK Launcher, comparte tus creaciones, pide ayuda y contribuye al proyecto de código abierto.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" style="padding: 60px 32px;">
+        <div class="footer-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; text-align: left;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                        <img src="/Drk_Launcher.png" alt="DRK Launcher" style="width: 40px; height: 40px; border-radius: 8px;">
+                        <span style="font-size: 18px; font-weight: 600; color: var(--text-primary);">DRK Launcher</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+                        El launcher de Minecraft más completo y potente. Código abierto, gratuito y sin anuncios.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 16px;">Enlaces Rápidos</h4>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary); font-size: 14px; line-height: 2;">
+                        <li><a href="#inicio" style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Inicio</a></li>
+                        <li><a href="#caracteristicas" style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Características</a></li>
+                        <li><a href="#comparativa" style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Comparativa</a></li>
+                        <li><a href="#blog" style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 16px;">Soporte</h4>
+                    <ul style="list-style: none; padding: 0; color: var(--text-secondary); font-size: 14px; line-height: 2;">
+                        <li><a href="mailto:soporte@drklauncher.com" style="color: var(--accent); text-decoration: none; transition: color 0.2s;">📧 soporte@drklauncher.com</a></li>
+                        <li><a href="mailto:mejoras@drklauncher.com" style="color: var(--accent); text-decoration: none; transition: color 0.2s;">💡 mejoras@drklauncher.com</a></li>
+                        <li><a href="mailto:fallos@drklauncher.com" style="color: var(--accent); text-decoration: none; transition: color 0.2s;">🐛 fallos@drklauncher.com</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--text-primary); font-size: 16px; font-weight: 600; margin-bottom: 16px;">Síguenos</h4>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="https://github.com/drklauncher" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s; font-size: 14px;">
+                            <span>📦</span> GitHub
+                        </a>
+                        <a href="https://discord.gg/drklauncher" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s; font-size: 14px;">
+                            <span>💬</span> Discord
+                        </a>
+                        <a href="https://twitter.com/drklauncher" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); text-decoration: none; transition: all 0.2s; font-size: 14px;">
+                            <span>🐦</span> Twitter
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 24px; text-align: center;">
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">© 2024 DRK Launcher. Todos los derechos reservados.</p>
+                <p style="color: var(--text-secondary); font-size: 12px;">
+                    DRK Launcher es un proyecto de código abierto. Contribuciones y sugerencias son bienvenidas.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .nav-link:hover,
+        footer a:hover {
+            color: var(--accent) !important;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+
+    <script>
+        // Intersection Observer para animaciones al hacer scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            // Observar todas las secciones y cards
+            document.querySelectorAll('.feature-card, .comparison-table, .section-title').forEach(el => {
+                el.classList.add('fade-in-on-scroll');
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
+

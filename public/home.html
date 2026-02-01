@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRK Launcher - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #131827;
+            --bg-card: #1a1f2e;
+            --bg-hover: #1e2538;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: rgba(59, 130, 246, 0.1);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Estilo de scrollbar del launcher */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(107, 114, 128, 0.5) rgba(31, 41, 55, 0.2);
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.2);
+            border-radius: 4px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(107, 114, 128, 0.5);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            left: -280px;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 24px 0;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sidebar-logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-section-title {
+            padding: 0 24px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-item-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg-hover);
+        }
+
+        .menu-toggle span {
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .navbar-brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-hover);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .user-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .profile-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent);
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            border-left-color: var(--danger);
+        }
+
+        .dropdown-item-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 0;
+            transition: margin-left 0.3s;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            margin-top: 32px;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-light);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-left: 64px;
+        }
+
+        .step-features {
+            margin-top: 16px;
+            margin-left: 64px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .step-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .step-feature::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-card:nth-child(1) { animation-delay: 0.1s; }
+        .step-card:nth-child(2) { animation-delay: 0.2s; }
+        .step-card:nth-child(3) { animation-delay: 0.3s; }
+        .step-card:nth-child(4) { animation-delay: 0.4s; }
+        .step-card:nth-child(5) { animation-delay: 0.5s; }
+        .step-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Efectos de hover mejorados */
+        .step-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Transiciones suaves */
+        .step-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+
+            .content-wrapper {
+                padding: 16px;
+            }
+
+            .step-description,
+            .step-features {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <img src="/Drk_Launcher.png" alt="DRK Launcher">
+                <span>DRK Launcher</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <a href="/home" class="sidebar-item active">
+                <div class="sidebar-item-icon">🏠</div>
+                <span>Home (Cómo Funciona)</span>
+            </a>
+            <a href="/download" class="sidebar-item">
+                <div class="sidebar-item-icon">⬇️</div>
+                <span>Descargar Instalador</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Personalización</div>
+            <a href="/skins" class="sidebar-item">
+                <div class="sidebar-item-icon">👤</div>
+                <span>Gestor de Skins</span>
+            </a>
+            <a href="/layers" class="sidebar-item">
+                <div class="sidebar-item-icon">🛡️</div>
+                <span>Configuración de Capas</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Contenido</div>
+            <a href="/servers" class="sidebar-item">
+                <div class="sidebar-item-icon">🌐</div>
+                <span>Servidores Destacados</span>
+            </a>
+            <a href="/community" class="sidebar-item">
+                <div class="sidebar-item-icon">💬</div>
+                <span>Comunidad y Soporte</span>
+            </a>
+            <a href="/changelog" class="sidebar-item">
+                <div class="sidebar-item-icon">📄</div>
+                <span>Registro de Cambios</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Sistema</div>
+            <a href="/faq" class="sidebar-item">
+                <div class="sidebar-item-icon">❓</div>
+                <span>Preguntas Frecuentes (FAQ)</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-left">
+                <div class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="navbar-brand">
+                    <img src="/Drk_Launcher.png" alt="DRK Launcher">
+                    <span>DRK Launcher</span>
+                </div>
+            </div>
+            <div class="navbar-right">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Cargando...</div>
+                        <div class="user-type" id="userType">Cuenta DRK</div>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-item" onclick="handleManageAccount()">
+                            <div class="dropdown-item-icon">⚙️</div>
+                            <span>Administrar Cuenta</span>
+                        </div>
+                        <div class="dropdown-item" onclick="handleSupport()">
+                            <div class="dropdown-item-icon">💬</div>
+                            <span>Soporte</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item danger" onclick="handleLogout()">
+                            <div class="dropdown-item-icon">🚪</div>
+                            <span>Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <h1 class="page-title">Cómo Funciona DRK Launcher</h1>
+            <p class="page-subtitle">Descubre todas las características y funcionalidades del launcher más completo de Minecraft</p>
+
+            <div class="how-it-works">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2 class="step-title">Descarga e Instalación</h2>
+                    </div>
+                    <p class="step-description">
+                        DRK Launcher está disponible para Windows, macOS y Linux. La instalación es rápida y sencilla, sin pasos complicados. El launcher detecta automáticamente Java si está instalado en tu sistema y puede descargarlo si es necesario.
+                    </p>
+                    <div class="step-features">
+                        <div class="step-feature">Multiplataforma</div>
+                        <div class="step-feature">Instalación rápida</div>
+                        <div class="step-feature">Detección automática de Java</div>
+                        <div class="step-feature">Descarga automática de Java</div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Múltiples Métodos de Autenticación</h2>
+                    </div>
+                    <p class="step-description">
+                        DRK Launcher soporta 6 métodos diferentes de autenticación: Microsoft, cuentas no-premium, Ely.by, LittleSkin, Yggdrasil y nuestro propio sistema DRK Auth. Puedes tener múltiples perfiles y cambiar entre ellos fácilmente.
+                    </p>
+                    <div class="step-features">
+                        <div class="step-feature">Microsoft OAuth</div>
+                        <div class="step-feature">Cuentas no-premium</div>
+                        <div class="step-feature">Ely.by y LittleSkin</div>
+                        <div class="step-feature">Yggdrasil y DRK Auth</div>
+                        <div class="step-feature">Múltiples perfiles</div>
+                        <div class="step-feature">Gestión de skins y capas</div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2 class="step-title">Exploración de Contenido</h2>
+                    </div>
+                    <p class="step-description">
+                        Navega por miles de modpacks, mods, shaders, resourcepacks y datapacks desde Modrinth y CurseForge directamente desde el launcher. Búsqueda avanzada con filtros por versión, modloader y tipo de contenido.
+                    </p>
+                    <div class="step-features">
+                        <div class="step-feature">Modrinth y CurseForge</div>
+                        <div class="step-feature">Búsqueda avanzada</div>
+                        <div class="step-feature">Filtros inteligentes</div>
+                        <div class="step-feature">Vista previa de contenido</div>
+                        <div class="step-feature">Instalación directa</div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <h2 class="step-title">Sistema de Instancias</h2>
+                    </div>
+                    <p class="step-description">
+                        Crea instancias aisladas para cada modpack o versión. Cada instancia mantiene su propia configuración, mods, resourcepacks y shaders. El sistema detecta automáticamente versiones compatibles y modloaders requeridos.
+                    </p>
+                    <div class="step-features">
+                        <div class="step-feature">Instancias ilimitadas</div>
+                        <div class="step-feature">Aislamiento completo</div>
+                        <div class="step-feature">Configuración independiente</div>
+                        <div class="step-feature">Detección automática</div>
+                        <div class="step-feature">Copias de seguridad</div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">5</div>
+                        <h2 class="step-title">Gestión de Mods y Contenido</h2>
+                    </div>
+                    <p class="step-description">
+                        Instala mods, resourcepacks, shaders y datapacks directamente desde el launcher. El sistema detecta automáticamente versiones compatibles con tu instancia y modloader. Descarga múltiples elementos en paralelo con seguimiento de progreso en tiempo real.
+                    </p>
+                    <div class="step-features">
+                        <div class="step-feature">Instalación automática</div>
+                        <div class="step-feature">Detección de compatibilidad</div>
+                        <div class="step-feature">Descargas paralelas</div>
+                        <div class="step-feature">Seguimiento de progreso</div>
+                        <div class="step-feature">Soporte para 6 modloaders</div>
+                        <div class="step-feature">Gestión de dependencias</div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">6</div>
+                        <h2 class="step-title">Lanzamiento y Gestión</h2>
+                    </div>
+                    <p class="step-description">
+                        Lanza tu instancia con un solo clic. DRK Launcher gestiona automáticamente Java, RAM y todas las configuraciones necesarias. Visualiza logs en tiempo real, analiza crashes si ocurren problemas, y gestiona tus servidores favoritos con ping automático.
+                    </p>
+                    <div class="step-features">
+                        <div class="step-feature">Lanzamiento con un clic</div>
+                        <div class="step-feature">Gestión automática de Java</div>
+                        <div class="step-feature">Configuración de RAM</div>
+                        <div class="step-feature">Logs en tiempo real</div>
+                        <div class="step-feature">Análisis de crashes</div>
+                        <div class="step-feature">Gestión de servidores</div>
+                        <div class="step-feature">Soporte técnico</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = null;
+
+        // Cargar datos del usuario
+        window.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            updateUI();
+            setupEventListeners();
+        });
+
+        function loadUserData() {
+            const savedData = localStorage.getItem('drkAuthData');
+            if (savedData) {
+                try {
+                    userData = JSON.parse(savedData);
+                } catch (error) {
+                    console.error('Error al parsear datos:', error);
+                    window.location.href = '/login';
+                }
+            } else {
+                window.location.href = '/login';
+            }
+        }
+
+        function updateUI() {
+            if (userData && userData.selectedProfile) {
+                const userName = userData.selectedProfile.name;
+                document.getElementById('userName').textContent = userName;
+                document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+            }
+        }
+
+        function setupEventListeners() {
+            // Toggle sidebar
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                menuToggle.classList.remove('active');
+            });
+
+            // Toggle profile dropdown
+            const userProfile = document.getElementById('userProfile');
+            const profileDropdown = document.getElementById('profileDropdown');
+
+            userProfile.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userProfile.contains(e.target)) {
+                    profileDropdown.classList.remove('open');
+                }
+            });
+        }
+
+        function handleManageAccount() {
+            alert('Funcionalidad de administración de cuenta próximamente disponible');
+        }
+
+        function handleSupport() {
+            window.open('mailto:soporte@drklauncher.com', '_blank');
+        }
+
+        function handleLogout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('drkAuthData');
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRK Launcher - Configuración de Capas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #131827;
+            --bg-card: #1a1f2e;
+            --bg-hover: #1e2538;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: rgba(59, 130, 246, 0.1);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Estilo de scrollbar del launcher */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(107, 114, 128, 0.5) rgba(31, 41, 55, 0.2);
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.2);
+            border-radius: 4px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(107, 114, 128, 0.5);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            left: -280px;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 24px 0;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sidebar-logo img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-section-title {
+            padding: 0 24px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-item-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg-hover);
+        }
+
+        .menu-toggle span {
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .navbar-brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-hover);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .user-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .profile-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent);
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            border-left-color: var(--danger);
+        }
+
+        .dropdown-item-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 0;
+            transition: margin-left 0.3s;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        /* Cape Manager */
+        .cape-manager {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .cape-upload-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .cape-preview-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .upload-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .cape-preview {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .cape-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .cape-preview-placeholder {
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .cape-info {
+            margin-bottom: 16px;
+        }
+
+        .cape-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .cape-date {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .cape-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .action-btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .action-btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .action-btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .capes-list {
+            margin-top: 24px;
+        }
+
+        .cape-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cape-item-preview {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .cape-item-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .cape-item-info {
+            flex: 1;
+        }
+
+        .cape-item-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .cape-item-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .cape-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .gallery-section {
+            margin-top: 32px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px;
+        }
+
+        .gallery-item {
+            width: 100%;
+            height: 120px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .gallery-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .gallery-item img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cape-manager {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+
+            .content-wrapper {
+                padding: 16px;
+            }
+
+            .cape-manager {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <img src="/Drk_Launcher.png" alt="DRK Launcher">
+                <span>DRK Launcher</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <a href="/home" class="sidebar-item">
+                <div class="sidebar-item-icon">🏠</div>
+                <span>Home (Cómo Funciona)</span>
+            </a>
+            <a href="/download" class="sidebar-item">
+                <div class="sidebar-item-icon">⬇️</div>
+                <span>Descargar Instalador</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Personalización</div>
+            <a href="/skins" class="sidebar-item">
+                <div class="sidebar-item-icon">👤</div>
+                <span>Gestor de Skins</span>
+            </a>
+            <a href="/layers" class="sidebar-item active">
+                <div class="sidebar-item-icon">🛡️</div>
+                <span>Configuración de Capas</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Contenido</div>
+            <a href="/servers" class="sidebar-item">
+                <div class="sidebar-item-icon">🌐</div>
+                <span>Servidores Destacados</span>
+            </a>
+            <a href="/community" class="sidebar-item">
+                <div class="sidebar-item-icon">💬</div>
+                <span>Comunidad y Soporte</span>
+            </a>
+            <a href="/changelog" class="sidebar-item">
+                <div class="sidebar-item-icon">📄</div>
+                <span>Registro de Cambios</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Sistema</div>
+            <a href="/faq" class="sidebar-item">
+                <div class="sidebar-item-icon">❓</div>
+                <span>Preguntas Frecuentes (FAQ)</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-left">
+                <div class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="navbar-brand">
+                    <img src="/Drk_Launcher.png" alt="DRK Launcher">
+                    <span>DRK Launcher</span>
+                </div>
+            </div>
+            <div class="navbar-right">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Cargando...</div>
+                        <div class="user-type" id="userType">Cuenta DRK</div>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-item" onclick="handleManageAccount()">
+                            <div class="dropdown-item-icon">⚙️</div>
+                            <span>Administrar Cuenta</span>
+                        </div>
+                        <div class="dropdown-item" onclick="handleSupport()">
+                            <div class="dropdown-item-icon">💬</div>
+                            <span>Soporte</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item danger" onclick="handleLogout()">
+                            <div class="dropdown-item-icon">🚪</div>
+                            <span>Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <h1 class="page-title">Configuración de Capas</h1>
+            <p class="page-subtitle">Sube y gestiona tus capas personalizadas para Minecraft</p>
+
+            <div class="cape-manager">
+                <div class="cape-upload-section">
+                    <h2 class="section-title">Subir Nueva Capa</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">🛡️</div>
+                        <p class="upload-text">Haz clic o arrastra una imagen aquí</p>
+                        <p class="upload-hint">Formato: .png | Tamaño: 64x32 píxeles (recomendado)</p>
+                        <input type="file" id="fileInput" class="file-input" accept=".png">
+                    </div>
+                    <button class="upload-btn" onclick="uploadCape()">Subir Capa</button>
+                </div>
+
+                <div class="cape-preview-section">
+                    <h2 class="section-title">Capa Actual</h2>
+                    <div class="cape-preview">
+                        <div class="cape-preview-placeholder">
+                            <div style="font-size: 48px; margin-bottom: 12px;">🛡️</div>
+                            <p>Selecciona una capa para previsualizar</p>
+                        </div>
+                    </div>
+                    <div class="cape-info">
+                        <div class="cape-name">Capa por defecto</div>
+                        <div class="cape-date">No disponible</div>
+                    </div>
+                    <div class="cape-actions">
+                        <button class="action-btn action-btn-primary" onclick="setActiveCape()">Usar como Capa Activa</button>
+                        <button class="action-btn action-btn-secondary" onclick="downloadCape()">Descargar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="capes-list">
+                <h2 class="section-title">Tus Capas</h2>
+                <div class="cape-item">
+                    <div class="cape-item-preview">
+                        <img src="/capes/default.png" alt="Capa por defecto">
+                    </div>
+                    <div class="cape-item-info">
+                        <div class="cape-item-name">Capa por defecto</div>
+                        <div class="cape-item-date">Fecha: No disponible</div>
+                    </div>
+                    <div class="cape-item-actions">
+                        <button class="action-btn action-btn-secondary" onclick="previewCape()">Ver</button>
+                        <button class="action-btn action-btn-danger" onclick="deleteCape()">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gallery-section">
+                <h2 class="section-title">Galería de Capas</h2>
+                <div class="gallery-grid">
+                    <div class="gallery-item" onclick="selectCapeFromGallery('cape1')">
+                        <img src="/capes/cape1.png" alt="Capa 1">
+                    </div>
+                    <div class="gallery-item" onclick="selectCapeFromGallery('cape2')">
+                        <img src="/capes/cape2.png" alt="Capa 2">
+                    </div>
+                    <div class="gallery-item" onclick="selectCapeFromGallery('cape3')">
+                        <img src="/capes/cape3.png" alt="Capa 3">
+                    </div>
+                    <div class="gallery-item" onclick="selectCapeFromGallery('cape4')">
+                        <img src="/capes/cape4.png" alt="Capa 4">
+                    </div>
+                    <div class="gallery-item" onclick="selectCapeFromGallery('cape5')">
+                        <img src="/capes/cape5.png" alt="Capa 5">
+                    </div>
+                    <div class="gallery-item" onclick="selectCapeFromGallery('cape6')">
+                        <img src="/capes/cape6.png" alt="Capa 6">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Estilos para notificaciones */
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .notification-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notification-modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification-overlay.show .notification-modal {
+            transform: translateY(0);
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .notification-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .notification-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .notification-content {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .notification-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .notification-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .notification-btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .notification-btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .notification-btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .notification-btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .notification-btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .notification-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .notification-success { color: var(--success); }
+        .notification-error { color: var(--danger); }
+        .notification-warning { color: #f59e0b; }
+        .notification-info { color: var(--accent); }
+    </style>
+
+    <script>
+        let userData = null;
+        let userCapes = []; // Array para almacenar las capas del usuario
+        let currentPreviewCape = null; // Capa actualmente en previsualización
+
+        // Cargar datos del usuario
+        window.addEventListener('DOMContentLoaded', async () => {
+            loadUserData();
+            await updateUI();
+            setupEventListeners();
+            await loadUserCapes(); // Cargar capas del usuario
+        });
+
+        function loadUserData() {
+            const savedData = localStorage.getItem('drkAuthData');
+            if (savedData) {
+                try {
+                    userData = JSON.parse(savedData);
+                } catch (error) {
+                    console.error('Error al parsear datos:', error);
+                    window.location.href = '/login';
+                }
+            } else {
+                window.location.href = '/login';
+            }
+        }
+
+        async function updateUI() {
+            if (userData && userData.selectedProfile) {
+                const userName = userData.selectedProfile.name;
+                document.getElementById('userName').textContent = userName;
+                document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+            }
+        }
+
+        function setupEventListeners() {
+            // Toggle sidebar
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                menuToggle.classList.remove('active');
+            });
+
+            // Toggle profile dropdown
+            const userProfile = document.getElementById('userProfile');
+            const profileDropdown = document.getElementById('profileDropdown');
+
+            userProfile.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userProfile.contains(e.target)) {
+                    profileDropdown.classList.remove('open');
+                }
+            });
+
+            // Upload area click
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const fileName = file.name;
+                    uploadArea.querySelector('.upload-text').textContent = fileName;
+                }
+            });
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(title, message, type = 'info', hasConfirm = false, onConfirm = null, onCancel = null) {
+            // Eliminar notificaciones anteriores
+            const existingOverlay = document.querySelector('.notification-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+
+            // Crear overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'notification-overlay show';
+
+            // Determinar icono según el tipo
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            else if (type === 'error') icon = '❌';
+            else if (type === 'warning') icon = '⚠️';
+
+            overlay.innerHTML = `
+                <div class="notification-modal">
+                    <div class="notification-header">
+                        <div class="notification-title">${icon} ${title}</div>
+                        <button class="notification-close" onclick="closeNotification()">&times;</button>
+                    </div>
+                    <div class="notification-content">${message}</div>
+                    <div class="notification-actions">
+                        ${hasConfirm ?
+                            `<button class="notification-btn notification-btn-danger" onclick="confirmNotification('${onConfirm}', '${onCancel}')">Sí</button>
+                             <button class="notification-btn notification-btn-secondary" onclick="closeNotification()">No</button>` :
+                            `<button class="notification-btn notification-btn-primary" onclick="closeNotification()">Aceptar</button>`
+                        }
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Cerrar al hacer clic fuera
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeNotification();
+                }
+            });
+        }
+
+        // Función para cerrar notificación
+        function closeNotification() {
+            const overlay = document.querySelector('.notification-overlay');
+            if (overlay) {
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                }, 300);
+            }
+        }
+
+        // Función para confirmar acción
+        function confirmNotification(onConfirm, onCancel) {
+            closeNotification();
+            if (onConfirm && typeof window[onConfirm] === 'function') {
+                window[onConfirm]();
+            } else if (onConfirm) {
+                // Si onConfirm es un string que representa una acción
+                eval(onConfirm);
+            }
+        }
+
+        async function uploadCape() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files[0]) {
+                const file = fileInput.files[0];
+
+                // Validar tipo de archivo
+                if (file.type !== 'image/png') {
+                    showNotification('Formato no válido', 'Por favor, selecciona un archivo PNG para tu capa.', 'error');
+                    return;
+                }
+
+                // Validar tamaño del archivo (máximo 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    showNotification('Archivo demasiado grande', 'El tamaño máximo permitido es 2MB. Por favor, reduce el tamaño de tu imagen.', 'error');
+                    return;
+                }
+
+                // Validar dimensiones (debería ser 64x32 o múltiplos para capas de Minecraft)
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    img.onload = function() {
+                        const width = img.width;
+                        const height = img.height;
+
+                        // Verificar proporciones válidas para capas de Minecraft (64x32 es estándar)
+                        if (!((width === 64 && height === 32) ||
+                              (width === 128 && height === 64) ||
+                              (width === 256 && height === 128) ||
+                              (width / height === 2))) { // Relación 2:1 general
+                            showNotification('Dimensiones no válidas', 'Las dimensiones de la imagen no son válidas para una capa de Minecraft. La proporción recomendada es 2:1 (por ejemplo, 64x32, 128x64).', 'error');
+                            return;
+                        }
+
+                        // Simular subida a servidor (en una implementación real, aquí iría la lógica real)
+                        const capeId = 'cape_' + Date.now();
+                        const capeName = file.name.replace('.png', '');
+
+                        // Crear objeto de capa
+                        const newCape = {
+                            id: capeId,
+                            name: capeName,
+                            url: URL.createObjectURL(file), // URL temporal para previsualización
+                            uploadedAt: new Date().toISOString()
+                        };
+
+                        // Añadir a la lista de capas del usuario
+                        userCapes.push(newCape);
+
+                        // Actualizar la interfaz
+                        updateCapesList();
+                        previewCape(newCape);
+
+                        showNotification('Capa subida exitosamente', `La capa "${file.name}" se ha subido correctamente.`, 'success');
+
+                        // Resetear input
+                        fileInput.value = '';
+                        document.getElementById('uploadArea').querySelector('.upload-text').textContent = 'Haz clic o arrastra una imagen aquí';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Ningún archivo seleccionado', 'Por favor, selecciona una imagen PNG para subir como capa.', 'warning');
+            }
+        }
+
+        function previewCape(cape) {
+            currentPreviewCape = cape;
+            const previewContainer = document.querySelector('.cape-preview');
+            previewContainer.innerHTML = `<img src="${cape.url}" alt="Previsualización de capa" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+
+            // Actualizar información de la capa
+            document.querySelector('.cape-name').textContent = cape.name;
+            document.querySelector('.cape-date').textContent = new Date(cape.uploadedAt).toLocaleDateString();
+        }
+
+        async function setActiveCape() {
+            if (!currentPreviewCape) {
+                showNotification('Ninguna capa seleccionada', 'Por favor, selecciona una capa para establecer como activa.', 'warning');
+                return;
+            }
+
+            try {
+                // Enviar solicitud para establecer la capa como activa
+                const response = await fetch('/api/user/cape/active', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('drkAuthData')).accessToken
+                    },
+                    body: JSON.stringify({
+                        capeUrl: currentPreviewCape.url
+                    })
+                });
+
+                if (response.ok) {
+                    showNotification('Capa activa actualizada', '¡La capa ha sido establecida como activa exitosamente!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    showNotification('Error al actualizar', 'No se pudo establecer la capa como activa: ' + errorData.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error al establecer la capa como activa:', error);
+                showNotification('Error de conexión', 'Hubo un problema al conectar con el servidor. Por favor, inténtalo de nuevo.', 'error');
+            }
+        }
+
+        function downloadCape() {
+            if (!currentPreviewCape) {
+                showNotification('Ninguna capa seleccionada', 'Por favor, selecciona una capa para descargar.', 'warning');
+                return;
+            }
+
+            // Crear un enlace temporal para descargar la imagen
+            const link = document.createElement('a');
+            link.href = currentPreviewCape.url;
+            link.download = currentPreviewCape.name + '.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showNotification('Descarga iniciada', 'La descarga de la capa ha comenzado.', 'success');
+        }
+
+        async function deleteCape(capeId) {
+            showNotification(
+                'Confirmar eliminación',
+                '¿Estás seguro de que quieres eliminar esta capa? Esta acción no se puede deshacer.',
+                'warning',
+                true,
+                `executeDeleteCape('${capeId}')`,
+                'closeNotification()'
+            );
+        }
+
+        async function executeDeleteCape(capeId) {
+            try {
+                // Enviar solicitud para eliminar la capa
+                const response = await fetch(`/api/user/capes/${capeId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('drkAuthData')).accessToken
+                    }
+                });
+
+                if (response.ok) {
+                    // Eliminar del array local
+                    userCapes = userCapes.filter(cape => cape.id !== capeId);
+
+                    // Actualizar la interfaz
+                    updateCapesList();
+
+                    // Si se eliminó la capa actualmente previsualizada, limpiar la previsualización
+                    if (currentPreviewCape && currentPreviewCape.id === capeId) {
+                        currentPreviewCape = null;
+                        const previewContainer = document.querySelector('.cape-preview');
+                        previewContainer.innerHTML = `
+                            <div class="cape-preview-placeholder">
+                                <div style="font-size: 48px; margin-bottom: 12px;">🛡️</div>
+                                <p>Selecciona una capa para previsualizar</p>
+                            </div>
+                        `;
+                        document.querySelector('.cape-name').textContent = 'Capa por defecto';
+                        document.querySelector('.cape-date').textContent = 'No disponible';
+                    }
+
+                    showNotification('Capa eliminada', 'La capa ha sido eliminada exitosamente.', 'success');
+                } else {
+                    const errorData = await response.json();
+                    showNotification('Error al eliminar', 'No se pudo eliminar la capa: ' + errorData.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error al eliminar la capa:', error);
+                showNotification('Error de conexión', 'Hubo un problema al conectar con el servidor. Por favor, inténtalo de nuevo.', 'error');
+            }
+        }
+
+        async function loadUserCapes() {
+            try {
+                const response = await fetch('/api/user/capes', {
+                    headers: {
+                        'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('drkAuthData')).accessToken
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    userCapes = data.capes.map(cape => ({
+                        id: cape.id,
+                        name: cape.name,
+                        url: cape.url,
+                        uploadedAt: cape.uploadedAt
+                    }));
+
+                    updateCapesList();
+                } else {
+                    console.error('Error al cargar capas:', await response.json());
+                }
+            } catch (error) {
+                console.error('Error de conexión al cargar capas:', error);
+            }
+        }
+
+        function updateCapesList() {
+            const capesList = document.querySelector('.capes-list');
+            if (!capesList) return;
+
+            // Encontrar el contenedor de la lista o crearlo
+            let listContainer = capesList.querySelector('.capes-items-container');
+            if (!listContainer) {
+                listContainer = document.createElement('div');
+                listContainer.className = 'capes-items-container';
+                capesList.appendChild(listContainer);
+            }
+
+            // Limpiar contenido anterior
+            listContainer.innerHTML = '';
+
+            // Añadir capas a la lista
+            userCapes.forEach(cape => {
+                const capeItem = document.createElement('div');
+                capeItem.className = 'cape-item';
+                capeItem.innerHTML = `
+                    <div class="cape-item-preview">
+                        <img src="${cape.url}" alt="${cape.name}">
+                    </div>
+                    <div class="cape-item-info">
+                        <div class="cape-item-name">${cape.name}</div>
+                        <div class="cape-item-date">Fecha: ${new Date(cape.uploadedAt).toLocaleDateString()}</div>
+                    </div>
+                    <div class="cape-item-actions">
+                        <button class="action-btn action-btn-secondary" onclick="previewCape(${JSON.stringify(cape).replace(/"/g, '&quot;')})">Ver</button>
+                        <button class="action-btn action-btn-danger" onclick="deleteCape('${cape.id}')">Eliminar</button>
+                    </div>
+                `;
+                listContainer.appendChild(capeItem);
+            });
+
+            // Si no hay capas, mostrar mensaje
+            if (userCapes.length === 0) {
+                listContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">No tienes capas subidas aún. Sube tu primera capa usando el formulario de arriba.</p>';
+            }
+        }
+
+        function selectCapeFromGallery(capeName) {
+            showNotification('Capa seleccionada', `Has seleccionado la capa: ${capeName}`, 'info');
+        }
+
+        function handleManageAccount() {
+            showNotification('Funcionalidad próximamente', 'La funcionalidad de administración de cuenta estará disponible próximamente.', 'info');
+        }
+
+        function handleSupport() {
+            window.open('mailto:soporte@drklauncher.com', '_blank');
+        }
+
+        function handleLogout() {
+            showNotification(
+                'Cerrar sesión',
+                '¿Estás seguro de que quieres cerrar sesión?',
+                'warning',
+                true,
+                'performLogout()',
+                'closeNotification()'
+            );
+        }
+
+        function performLogout() {
+            localStorage.removeItem('drkAuthData');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

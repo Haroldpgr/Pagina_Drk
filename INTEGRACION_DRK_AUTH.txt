@@ -1,0 +1,170 @@
+# Integración de DRK Auth con el Launcher
+
+## Descripción General
+Este documento explica cómo integrar el servidor de autenticación DRK Auth con tu launcher para permitir el inicio de sesión con cuentas DRK y aplicar skins y capas personalizadas tanto en singleplayer como en multiplayer.
+
+## Endpoints Disponibles
+
+### 1. Autenticación (Yggdrasil Protocol)
+- **URL**: `http://localhost:3000/authserver/authenticate`
+- **Método**: `POST`
+- **Descripción**: Autentica al usuario y devuelve tokens de acceso
+
+**Ejemplo de solicitud:**
+```json
+{
+  "agent": {
+    "name": "Minecraft",
+    "version": 1
+  },
+  "username": "usuario",
+  "password": "contraseña",
+  "clientToken": "token_cliente_opcional",
+  "requestUser": true
+}
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "accessToken": "token_acceso",
+  "clientToken": "token_cliente",
+  "selectedProfile": {
+    "id": "uuid_usuario",
+    "name": "nombre_usuario"
+  },
+  "availableProfiles": [
+    {
+      "id": "uuid_usuario",
+      "name": "nombre_usuario"
+    }
+  ],
+  "user": {
+    "id": "uuid_usuario",
+    "properties": []
+  }
+}
+```
+
+### 2. Refresco de Token
+- **URL**: `http://localhost:3000/authserver/refresh`
+- **Método**: `POST`
+
+### 3. Validación de Token
+- **URL**: `http://localhost:3000/authserver/validate`
+- **Método**: `POST`
+
+### 4. Perfil de Usuario (Personalizado)
+- **URL**: `http://localhost:3000/api/user/profile`
+- **Método**: `GET`
+- **Encabezado**: `Authorization: Bearer {accessToken}`
+- **Descripción**: Obtiene información completa del usuario incluyendo skins y capas
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "user": {
+    "id": "uuid_usuario",
+    "username": "nombre_usuario",
+    "email": "email@usuario.com",
+    "skinUrl": "url_de_la_skin",
+    "capeUrl": "url_de_la_capa",
+    "createdAt": "fecha_creacion",
+    "lastLogin": "fecha_ultimo_login"
+  },
+  "profiles": [
+    {
+      "id": "uuid_perfil",
+      "name": "nombre_perfil",
+      "skinUrl": "url_skin_perfil",
+      "capeUrl": "url_capa_perfil",
+      "createdAt": "fecha_creacion"
+    }
+  ]
+}
+```
+
+### 5. Actualizar Skin Activa
+- **URL**: `http://localhost:3000/api/user/skin/active`
+- **Método**: `PUT`
+- **Encabezado**: `Authorization: Bearer {accessToken}`
+- **Cuerpo**: `{"skinUrl": "url_de_la_skin"}`
+
+### 6. Actualizar Capa Activa
+- **URL**: `http://localhost:3000/api/user/cape/active`
+- **Método**: `PUT`
+- **Encabezado**: `Authorization: Bearer {accessToken}`
+- **Cuerpo**: `{"capeUrl": "url_de_la_capa"}`
+
+## Configuración en el Launcher
+
+### 1. Añadir Método de Autenticación DRK
+- En la pantalla de inicio de sesión, añadir una opción "DRK Auth"
+- Al seleccionar esta opción, redirigir al usuario a la autenticación con los endpoints mencionados
+
+### 2. Flujo de Autenticación
+1. El usuario ingresa su nombre de usuario y contraseña
+2. Enviar solicitud a `/authserver/authenticate`
+3. Si la autenticación es exitosa, guardar el accessToken
+4. Obtener información del perfil desde `/api/user/profile`
+5. Aplicar la skin y capa personalizadas
+
+### 3. Aplicar Skins y Capas
+- Obtener la URL de la skin desde la respuesta del perfil
+- Aplicar la skin tanto en singleplayer como en multiplayer
+- Lo mismo para las capas
+
+### 4. Formato de Skins y Capas
+- **Skins**: Archivos PNG con dimensiones 64x32, 64x64, 128x64 o 128x128 píxeles
+- **Capas**: Archivos PNG con proporción 2:1 (por ejemplo, 64x32, 128x64)
+
+## Ejemplo de Implementación
+
+### 1. Autenticación
+```javascript
+// Autenticar usuario
+const authResponse = await fetch('http://localhost:3000/authserver/authenticate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    agent: { name: 'Minecraft', version: 1 },
+    username: 'usuario',
+    password: 'contraseña',
+    requestUser: true
+  })
+});
+
+const authData = await authResponse.json();
+const accessToken = authData.accessToken;
+```
+
+### 2. Obtener Perfil
+```javascript
+// Obtener perfil con skin y capa
+const profileResponse = await fetch('http://localhost:3000/api/user/profile', {
+  headers: {
+    'Authorization': 'Bearer ' + accessToken
+  }
+});
+
+const profileData = await profileResponse.json();
+const skinUrl = profileData.user.skinUrl;
+const capeUrl = profileData.user.capeUrl;
+```
+
+## Consideraciones Importantes
+
+1. **Seguridad**: Asegúrate de usar HTTPS en producción
+2. **Tokens**: Los accessTokens expiran después de 24 horas
+3. **Caché**: Considera cachear la información del perfil para mejorar el rendimiento
+4. **Errores**: Maneja adecuadamente los errores de autenticación
+5. **Compatibilidad**: El servidor sigue el protocolo Yggdrasil estándar
+
+## URL del Servidor
+- **Desarrollo**: `http://localhost:3000`
+- **Producción**: Reemplaza con la URL de tu servidor en producción
+
+## Soporte
+- Para problemas de integración, revisa los logs del servidor
+- Asegúrate de que el servidor DRK Auth esté corriendo antes de intentar la autenticación
